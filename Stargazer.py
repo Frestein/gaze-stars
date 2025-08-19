@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-# @Author  :   Arthals
-# @File    :   Stargazer.py
-# @Time    :   2025/01/22 16:16:16
-# @Contact :   zhuozhiyongde@126.com
-# @Software:   Visual Studio Code
+# @Author    : Arthals (huozhiyongde@126.com)
+# @Co-author : Frestein (frestein@tuta.io)
+# @File      : Stargazer.py
+# @Time      : 2025/01/22 16:16:16
 
 import json
 import os
 import re
-from collections import OrderedDict
+
 import requests
 
 
@@ -52,7 +51,7 @@ class Stargazer:
     def get_lists(self):
         url = f"https://github.com/{self.username}?tab=stars"
         response = requests.get(url)
-        pattern = f'href="/stars/{self.username}/lists/(\S+)".*?<h3 class="f4 text-bold no-wrap mr-3">(.*?)</h3>'
+        pattern = f'href="/stars/{self.username}/lists/(\\S+)".*?<h3 class="f4 text-bold no-wrap mr-3">(.*?)</h3>'
         match = re.findall(pattern, response.text, re.DOTALL)
         self.star_lists = [(url, name.strip()) for url, name in match]
         return self.star_lists
