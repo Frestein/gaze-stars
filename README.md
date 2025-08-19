@@ -4,14 +4,9 @@
 
 This GitHub Action queries the GitHub API to retrieve your starred repositories and generates a README sorted by your stargazed list.
 
-You can reference my repository [Frestein/awesome-stars](https://github.com/frestein/awesome-stars).
+You can reference my repository [Frestein/awesome-stars](https://github.com/frestein/awesome-stars). You can use it as template.
 
 ## Documentation
-
-### Prerequisites
-
-- An empty repository
-- A personal GitHub API token
 
 ### Configuration
 

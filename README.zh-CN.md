@@ -4,14 +4,9 @@
 
 这个 GitHub Action 可以通过查询 GitHub API 以获取你标星的仓库们，然后按星标列表排序生成 README。
 
-你可以参考我的仓库 [Frestein/awesome-stars](https://github.com/frestein/awesome-stars)。
+你可以参考我的仓库 [Frestein/awesome-stars](https://github.com/frestein/awesome-stars)。您可以将其用作模板。
 
 ## 文档
-
-### 前置要求
-
-- 一个空仓库
-- 一个个人 GitHub API 密钥
 
 ### 配置方法
 
