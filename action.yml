@@ -18,8 +18,11 @@ inputs:
     description: Commit message
     default: "chore(updates): updated entries in files"
   sort-by:
-    description: Sort by
+    description: Sort by (stars, updated)
     default: stars
+  style:
+    description: Style of README generation (table, list)
+    default: table
   template-path:
     description: Path to custom README template
     default: template/template.md
@@ -56,6 +59,7 @@ runs:
         TEMPLATE_PATH: ${{ inputs.template-path }}
         OUTPUT_PATH: ${{ inputs.output-path }}
         SORT_BY: ${{ inputs.sort-by }}
+        STYLE: ${{ inputs.style }}
     - name: Commit and push changes
       run: |
         cd code

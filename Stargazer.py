@@ -2,8 +2,6 @@
 # -*- encoding: utf-8 -*-
 # @Author    : Arthals (huozhiyongde@126.com)
 # @Co-author : Frestein (frestein@tuta.io)
-# @File      : Stargazer.py
-# @Time      : 2025/01/22 16:16:16
 
 import json
 import os
@@ -18,7 +16,8 @@ class Stargazer:
         self.token = os.getenv("GITHUB_TOKEN")
         self.template = os.getenv("TEMPLATE_PATH", "template/template.md")
         self.output = os.getenv("OUTPUT_PATH", "README.md")
-        self.sort_by = os.getenv("SORT_BY", "stars")
+        self.sort_by = os.getenv("SORT_BY", "stars").lower()
+        self.style = os.getenv("STYLE", "table").lower()
         self.star_lists = []
         self.star_list_repos = {}
         self.data = {}
@@ -80,39 +79,62 @@ class Stargazer:
         return self.star_list_repos
 
     def generate_readme(self):
+        text = ""
+
         contents_lines = []
-        body_lines = []
         contents_lines.append("## Contents")
         for _, list_name in self.star_lists:
             anchor = list_name.lower().replace(" ", "-")
             contents_lines.append(f"- [{list_name}](#{anchor})")
-
         contents_lines.append("")
 
-        for _, list_name in self.star_lists:
-            body_lines.append(f"## {list_name}")
-            repos = []
-            for user, repo in self.star_list_repos.get(_, []):
-                full_name = f"{user}/{repo}"
-                if full_name in self.data:
-                    repos.append((full_name, self.data[full_name]))
-            if not repos:
-                body_lines.append("- No repositories")
-            else:
-                for full_name, repo_data in repos:
-                    desc = repo_data["description"].replace("|", "\\|")
-                    body_lines.append(
-                        f"- [{full_name}](https://github.com/{full_name}) - {desc}"
-                    )
-            body_lines.append("")
+        if self.style == "list":
+            body_lines = []
+            for _, list_name in self.star_lists:
+                body_lines.append(f"## {list_name}")
+                repos = []
+                for user, repo in self.star_list_repos.get(_, []):
+                    full_name = f"{user}/{repo}"
+                    if full_name in self.data:
+                        repos.append((full_name, self.data[full_name]))
+                if not repos:
+                    body_lines.append("- No repositories")
+                else:
+                    for full_name, repo_data in repos:
+                        desc = repo_data["description"].replace("|", "\\|")
+                        body_lines.append(
+                            f"- [{full_name}](https://github.com/{full_name}) - {desc}"
+                        )
+                body_lines.append("")
+            text = "\n".join(contents_lines) + "\n" + "\n".join(body_lines)
 
-        generated_text = "\n".join(contents_lines) + "\n" + "\n".join(body_lines)
+        else:
+            text += "\n".join(contents_lines) + "\n\n"
+            for _, list_name in self.star_lists:
+                text += f"## {list_name}\n\n"
+                text += "| Repository | Description | Stars |\n"
+                text += "|------------|-------------|-------|\n"
+                repos = []
+                for user, repo in self.star_list_repos.get(_, []):
+                    full_name = f"{user}/{repo}"
+                    if full_name in self.data:
+                        repos.append((full_name, self.data[full_name]))
+                if not repos:
+                    text += "| *No repositories* | | |\n"
+                else:
+                    repos_sorted = sorted(
+                        repos, key=lambda x: x[1]["stars"], reverse=True
+                    )
+                    for full_name, repo_data in repos_sorted:
+                        desc = repo_data["description"].replace("|", "\\|")
+                        stars = repo_data["stars"]
+                        text += f"| [{full_name}](https://github.com/{full_name}) | {desc} | ⭐{stars} |\n"
+                text += "\n"
 
         with open(self.template, "r", encoding="utf-8") as f:
             template = f.read()
-
         with open(self.output, "w", encoding="utf-8") as f:
-            f.write(template.replace("[[GENERATE HERE]]", generated_text.strip()))
+            f.write(template.replace("[[GENERATE HERE]]", text.strip()))
 
 
 if __name__ == "__main__":
