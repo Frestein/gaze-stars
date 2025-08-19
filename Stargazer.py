@@ -80,48 +80,39 @@ class Stargazer:
         return self.star_list_repos
 
     def generate_readme(self):
-        text = ""
-        for list_url, list_name in self.star_lists:
-            repos = [
-                (f"{user}/{repo}", self.data[f"{user}/{repo}"])
-                for user, repo in self.star_list_repos.get(list_url, [])
-                if f"{user}/{repo}" in self.data
-            ]
-            if self.sort_by == "stars":
-                sorted_repos = sorted(repos, key=lambda x: x[1]["stars"], reverse=True)
+        contents_lines = []
+        body_lines = []
+        contents_lines.append("## Contents")
+        for _, list_name in self.star_lists:
+            anchor = list_name.lower().replace(" ", "-")
+            contents_lines.append(f"- [{list_name}](#{anchor})")
+
+        contents_lines.append("")
+
+        for _, list_name in self.star_lists:
+            body_lines.append(f"## {list_name}")
+            repos = []
+            for user, repo in self.star_list_repos.get(_, []):
+                full_name = f"{user}/{repo}"
+                if full_name in self.data:
+                    repos.append((full_name, self.data[full_name]))
+            if not repos:
+                body_lines.append("- No repositories")
             else:
-                sorted_repos = repos[::-1]
-            text += f"## {list_name}\n\n"
-            text += "| Repository | Description | Stars |\n"
-            text += "|------------|-------------|-------|\n"
-            for key, repo in sorted_repos:
-                repo["listed"] = True
-                desc = repo["description"].replace("|", "\\|")
-                text += f"| [{key}](https://github.com/{key}) | {desc} | ⭐{repo['stars']} |\n"
-            text += "\n"
-        if self.sort_by == "stars":
-            unlisted = sorted(
-                [key for key in self.data if not self.data[key]["listed"]],
-                key=lambda x: self.data[x]["stars"],
-                reverse=True,
-            )
-        else:
-            unlisted = [key for key in self.data if not self.data[key]["listed"]]
-            unlisted = unlisted[::-1]
-        text += "## Uncategorized Repositories\n\n"
-        text += "| Repository | Description | Stars |\n"
-        text += "|------------|-------------|-------|\n"
-        if not unlisted:
-            text += "| *All repositories have been categorized* | | |\n"
-        else:
-            for k in unlisted:
-                desc = self.data[k]["description"].replace("|", "\\|")
-                text += f"| [{k}](https://github.com/{k}) | {desc} | ⭐{self.data[k]['stars']} |\n"
-        text += "\n"
-        with open(self.template, "r") as f:
+                for full_name, repo_data in repos:
+                    desc = repo_data["description"].replace("|", "\\|")
+                    body_lines.append(
+                        f"- [{full_name}](https://github.com/{full_name}) - {desc}"
+                    )
+            body_lines.append("")
+
+        generated_text = "\n".join(contents_lines) + "\n" + "\n".join(body_lines)
+
+        with open(self.template, "r", encoding="utf-8") as f:
             template = f.read()
-        with open(self.output, "w") as f:
-            f.write(template.replace("[[GENERATE HERE]]", text.strip()))
+
+        with open(self.output, "w", encoding="utf-8") as f:
+            f.write(template.replace("[[GENERATE HERE]]", generated_text.strip()))
 
 
 if __name__ == "__main__":
