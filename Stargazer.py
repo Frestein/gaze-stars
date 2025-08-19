@@ -81,32 +81,24 @@ class Stargazer:
 
     def generate_readme(self):
         text = ""
-
-        # 生成分类表格
         for list_url, list_name in self.star_lists:
-            # 获取当前分类仓库并按stars降序
             repos = [
                 (f"{user}/{repo}", self.data[f"{user}/{repo}"])
                 for user, repo in self.star_list_repos.get(list_url, [])
                 if f"{user}/{repo}" in self.data
             ]
-            # sorted_repos = sorted(repos, key=lambda x: x[1]["stars"], reverse=True)
             if self.sort_by == "stars":
                 sorted_repos = sorted(repos, key=lambda x: x[1]["stars"], reverse=True)
             else:
-                # reverse repo
                 sorted_repos = repos[::-1]
-            # 生成表格内容
             text += f"## {list_name}\n\n"
-            text += "| 仓库名称 | 描述 | Star数 |\n"
-            text += "|----------|------|-------|\n"
+            text += "| Repository | Description | Stars |\n"
+            text += "|------------|-------------|-------|\n"
             for key, repo in sorted_repos:
                 repo["listed"] = True
                 desc = repo["description"].replace("|", "\\|")
                 text += f"| [{key}](https://github.com/{key}) | {desc} | ⭐{repo['stars']} |\n"
             text += "\n"
-
-        # 生成未分类表格
         if self.sort_by == "stars":
             unlisted = sorted(
                 [key for key in self.data if not self.data[key]["listed"]],
@@ -116,31 +108,25 @@ class Stargazer:
         else:
             unlisted = [key for key in self.data if not self.data[key]["listed"]]
             unlisted = unlisted[::-1]
-
-        text += "## 未分类仓库\n\n"
-        text += "| 仓库名称 | 描述 | Star数 |\n"
-        text += "|----------|------|-------|\n"
-
+        text += "## Uncategorized Repositories\n\n"
+        text += "| Repository | Description | Stars |\n"
+        text += "|------------|-------------|-------|\n"
         if not unlisted:
-            text += "| *所有仓库均已分类* | | |\n"
+            text += "| *All repositories have been categorized* | | |\n"
         else:
             for k in unlisted:
                 desc = self.data[k]["description"].replace("|", "\\|")
                 text += f"| [{k}](https://github.com/{k}) | {desc} | ⭐{self.data[k]['stars']} |\n"
-
         text += "\n"
-
-        # 生成完整README
         with open(self.template, "r") as f:
             template = f.read()
-
         with open(self.output, "w") as f:
             f.write(template.replace("[[GENERATE HERE]]", text.strip()))
 
 
 if __name__ == "__main__":
     stargazer = Stargazer()
-    stargazer.get_all_starred()  # 获取所有starred仓库
-    stargazer.get_lists()  # 获取分类列表
-    stargazer.get_all_repos()  # 获取每个分类的仓库
-    stargazer.generate_readme()  # 生成README
+    stargazer.get_all_starred()
+    stargazer.get_lists()
+    stargazer.get_all_repos()
+    stargazer.generate_readme()
