@@ -1,74 +1,65 @@
-name: 'gaze-stars'
-description: 'Generate starred list of yourself.'
-author: 'zhuozhiyongde'
+name: gaze-stars
+description: Generate starred list of yourself.
+author: zhuozhiyongde (zhuozhiyongde@126.com), Frestein (fretein@tuta.io)
 branding:
-  icon: 'star'
-  color: 'yellow'
-
+  icon: star
+  color: yellow
 inputs:
-  api-token:
-    description: 'Personal GitHub API token to avoid rate limits'
-    required: true
   github-username:
-    description: 'GitHub username to generate starred list for'
+    description: GitHub username to generate starred list for
     required: true
   git-name:
-    description: 'Name used for Git commits'
-    default: 'Github Action'
+    description: Name used for Git commits
+    default: Github Action
   git-email:
-    description: 'Email used for Git commits'
-    default: 'actions@users.noreply.github.com'
+    description: Email used for Git commits
+    default: actions@users.noreply.github.com
   git-message:
-    description: 'Commit message'
-    default: 'chore(updates): updated entries in files'
+    description: Commit message
+    default: "chore(updates): updated entries in files"
   sort-by:
-    description: 'Sort by'
-    default: 'stars'
+    description: Sort by
+    default: stars
   template-path:
-    description: 'Path to custom README template'
-    default: 'template/template.md'
+    description: Path to custom README template
+    default: template/template.md
   output-path:
-    description: 'Output file path'
-    default: 'README.md'
-
+    description: Output file path
+    default: README.md
 runs:
-  using: 'composite'
+  using: composite
   steps:
     - uses: actions/checkout@v4
       with:
-        path: './code'
-
+        path: "./code"
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
-
+        python-version: "3.10"
     - name: Install dependencies
       run: |
         git config --global user.name "${{ inputs.git-name }}"
         git config --global user.email "${{ inputs.git-email }}"
-        git clone https://github.com/zhuozhiyongde/gaze-stars.git
+        git clone https://github.com/Frestein/gaze-stars.git
         cd gaze-stars
         python -m pip install --upgrade pip
         pip install -r requirements.txt
       shell: bash
-
     - name: Run Stargazer
       run: |
         cd code
         python ../gaze-stars/Stargazer.py
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.api-token }}
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         GITHUB_USERNAME: ${{ inputs.github-username }}
         TEMPLATE_PATH: ${{ inputs.template-path }}
         OUTPUT_PATH: ${{ inputs.output-path }}
         SORT_BY: ${{ inputs.sort-by }}
-
     - name: Commit and push changes
       run: |
         cd code
-        git add README.md
+        git add ${{ inputs.output-path }}
         if ! git diff-index --quiet HEAD --; then
           git commit -m "${{ inputs.git-message }}"
           git push
@@ -77,4 +68,4 @@ runs:
         fi
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.api-token }}
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
