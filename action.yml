@@ -8,12 +8,6 @@ inputs:
   github-username:
     description: GitHub username to generate starred list for
     required: true
-  git-name:
-    description: Name used for Git commits
-    default: Github Action
-  git-email:
-    description: Email used for Git commits
-    default: actions@users.noreply.github.com
   git-message:
     description: Commit message
     default: "chore(updates): updated entries in files"
@@ -33,16 +27,12 @@ runs:
   using: composite
   steps:
     - uses: actions/checkout@v4
-      with:
-        path: "./code"
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
     - name: Install dependencies
       run: |
-        git config --global user.name "${{ inputs.git-name }}"
-        git config --global user.email "${{ inputs.git-email }}"
         git clone https://github.com/Frestein/gaze-stars.git
         cd gaze-stars
         python -m pip install --upgrade pip
@@ -50,8 +40,7 @@ runs:
       shell: bash
     - name: Run Stargazer
       run: |
-        cd code
-        python ../gaze-stars/Stargazer.py
+        python gaze-stars/Stargazer.py
       shell: bash
       env:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
@@ -62,7 +51,8 @@ runs:
         STYLE: ${{ inputs.style }}
     - name: Commit and push changes
       run: |
-        cd code
+        git config user.name 'github-actions[bot]'
+        git config user.email 'github-actions[bot]@users.noreply.github.com'
         git add ${{ inputs.output-path }}
         if ! git diff-index --quiet HEAD --; then
           git commit -m "${{ inputs.git-message }}"
