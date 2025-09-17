@@ -36,12 +36,12 @@ name: Update by list
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: 0 0 * * *
 jobs:
   update-by-list:
     runs-on: ubuntu-latest
     steps:
-      - name: Update repo category by list
+      - name: Update category by list
         uses: Frestein/gaze-stars@v1.3.0
         with:
           github-username: ${{ github.repository_owner }}
