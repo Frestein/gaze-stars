@@ -26,7 +26,8 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v5
+    - name: Checkout repository
+      uses: actions/checkout@v5
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
@@ -49,14 +50,17 @@ runs:
         OUTPUT_PATH: ${{ inputs.output-path }}
         SORT_BY: ${{ inputs.sort-by }}
         STYLE: ${{ inputs.style }}
-    - name: Commit and push changes
+    - name: Configure git
       run: |
         git config user.name 'github-actions[bot]'
         git config user.email 'github-actions[bot]@users.noreply.github.com'
+      shell: bash
+    - name: Commit and push changes
+      run: |
         git add ${{ inputs.output-path }}
         if ! git diff-index --quiet HEAD --; then
           git commit -m "${{ inputs.git-message }}"
-          git push
+          git push origin HEAD:main --force-with-lease
         else
           echo "No changes to commit."
         fi
