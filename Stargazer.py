@@ -50,7 +50,7 @@ class Stargazer:
     def get_lists(self):
         url = f"https://github.com/{self.username}?tab=stars"
         response = requests.get(url)
-        pattern = f'href="/stars/{self.username}/lists/(\\S+)".*?<h3 class="f4 text-bold no-wrap mr-3">(.*?)</h3>'
+        pattern = rf'href="/stars/{self.username}/lists/(\S+)"[\s\S]*?<h3 class=".*?">(.*?)</h3>'
         match = re.findall(pattern, response.text, re.DOTALL)
         self.star_lists = [(url, name.strip()) for url, name in match]
         return self.star_lists
@@ -63,7 +63,7 @@ class Stargazer:
                 username=self.username, list_name=list_name, page=page
             )
             response = requests.get(current_url)
-            pattern = r'<h3>\s*<a href="[^"]*">\s*<span class="text-normal">(\S+) / </span>(\S+)\s+</a>\s*</h3>'
+            pattern = r'<h2 class="h3">\s*<a href="[^"]*">\s*<span class="text-normal">(\S+) / </span>(\S+)\s*</a>\s*</h2>'
             match = re.findall(pattern, response.text)
             if not match:
                 break
