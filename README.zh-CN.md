@@ -31,7 +31,7 @@
 
 ## 示例
 
-```yml
+```yaml
 name: Update by list
 on:
   workflow_dispatch:

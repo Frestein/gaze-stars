@@ -31,7 +31,7 @@ Default output file name is `README.md`. You can customize the output path (rela
 
 ## Example
 
-```yml
+```yaml
 name: Update by list
 on:
   workflow_dispatch:
