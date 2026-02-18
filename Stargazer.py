@@ -78,13 +78,39 @@ class Stargazer:
             self.get_list_repos(list_url)
         return self.star_list_repos
 
+    def remove_emojis(self, data):
+        emoj = re.compile(
+            "["
+            "\U0001f600-\U0001f64f"
+            "\U0001f300-\U0001f5ff"
+            "\U0001f680-\U0001f6ff"
+            "\U0001f1e0-\U0001f1ff"
+            "\U00002500-\U00002bef"
+            "\U00002702-\U000027b0"
+            "\U000024c2-\U0001f251"
+            "\U0001f926-\U0001f937"
+            "\U00010000-\U0010ffff"
+            "\u2640-\u2642"
+            "\u2600-\u2b55"
+            "\u200d"
+            "\u23cf"
+            "\u23e9"
+            "\u231a"
+            "\ufe0f"
+            "\u3030"
+            "]+",
+            re.UNICODE,
+        )
+        return emoj.sub("", data)
+
     def generate_readme(self):
         text = ""
 
         contents_lines = []
         contents_lines.append("## Contents")
         for _, list_name in self.star_lists:
-            anchor = list_name.lower().replace(" ", "-")
+            clean_name = self.remove_emojis(list_name)
+            anchor = clean_name.lower().replace(" ", "-")
             contents_lines.append(f"- [{list_name}](#{anchor})")
         contents_lines.append("")
 
