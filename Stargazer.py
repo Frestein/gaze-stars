@@ -58,6 +58,10 @@ class Stargazer:
     def get_list_repos(self, list_name):
         url = "https://github.com/stars/{username}/lists/{list_name}?page={page}"
         page = 1
+
+        if list_name not in self.star_list_repos:
+            self.star_list_repos[list_name] = []
+
         while True:
             current_url = url.format(
                 username=self.username, list_name=list_name, page=page
@@ -67,8 +71,6 @@ class Stargazer:
             match = re.findall(pattern, response.text)
             if not match:
                 break
-            if list_name not in self.star_list_repos:
-                self.star_list_repos[list_name] = []
             self.star_list_repos[list_name].extend(match)
             page += 1
         return self.star_list_repos[list_name]
