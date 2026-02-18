@@ -116,10 +116,10 @@ class Stargazer:
 
         if self.style == "list":
             body_lines = []
-            for _, list_name in self.star_lists:
+            for list_url, list_name in self.star_lists:
                 body_lines.append(f"## {list_name}")
                 repos = []
-                for user, repo in self.star_list_repos.get(_, []):
+                for user, repo in self.star_list_repos.get(list_url, []):
                     full_name = f"{user}/{repo}"
                     if full_name in self.data:
                         repos.append((full_name, self.data[full_name]))
@@ -136,12 +136,12 @@ class Stargazer:
 
         else:
             text += "\n".join(contents_lines) + "\n\n"
-            for _, list_name in self.star_lists:
+            for list_url, list_name in self.star_lists:
                 text += f"## {list_name}\n\n"
                 text += "| Repository | Description | Stars |\n"
                 text += "|------------|-------------|-------|\n"
                 repos = []
-                for user, repo in self.star_list_repos.get(_, []):
+                for user, repo in self.star_list_repos.get(list_url, []):
                     full_name = f"{user}/{repo}"
                     if full_name in self.data:
                         repos.append((full_name, self.data[full_name]))
