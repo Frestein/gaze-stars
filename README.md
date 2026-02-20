@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update category by list
-        uses: Frestein/gaze-stars@v1.3.3
+        uses: Frestein/gaze-stars@v1.4.0
         with:
           github-username: ${{ github.repository_owner }}
           git-message: "docs(list): bump data"
